@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { kebabCase } from 'lodash'
 import { Helmet } from 'react-helmet'
@@ -14,7 +14,20 @@ export const BlogPostTemplate = ({
   title,
   helmet,
 }) => {
-  const PostContent = contentComponent || Content
+  const PostContent = contentComponent || Content;
+
+  const [ content, setContent ] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch('/.netlify/functions/hello');
+      const result = await response.json();
+
+      setContent(result && result.msg);
+    }
+
+    fetchData();
+  }, []);
 
   return (
     <section className="section">
@@ -25,6 +38,7 @@ export const BlogPostTemplate = ({
             <h1 className="title is-size-2 has-text-weight-bold is-bold-light">
               {title}
             </h1>
+            <h2>{content}</h2>
             <p>{description}</p>
             <PostContent content={content} />
             {tags && tags.length ? (
